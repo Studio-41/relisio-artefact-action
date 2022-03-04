@@ -56,7 +56,7 @@ function run() {
             if (!resourceType) {
                 throw new Error('resource-type is required');
             }
-            const availableResourceTypes = ['project, product, environment, kb'];
+            const availableResourceTypes = ['project', 'product', 'environment', 'kb'];
             if (!availableResourceTypes.includes(resourceType)) {
                 throw new Error(`resource-type must be one of ${availableResourceTypes.join(', ')}`);
             }
