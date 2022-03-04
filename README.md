@@ -1,19 +1,18 @@
-<img src="https://user-images.githubusercontent.com/11739105/152799348-e70d55f4-3914-43cd-866f-f2b979071be2.svg" alt="Relisio Product"  width="128" />
+<img src="https://user-images.githubusercontent.com/11739105/156749223-0a34348c-2155-4599-8b51-778cb9c91d50.svg" alt="Relisio Artefact"  width="128" />
 
 This Github action is an official [Relisio](https://www.relisio.com/) deploy utility.<br />
-Use it to create/update products within your workspace.
+Use it to upload artefacts within your products/projects.
 
 ### Prerequisites
  1. an active workspace at [www.relisio.com](https://www.relisio.com) or a self-hosted copy of Relisio;
- 2. an `api-key` authorized to **Create Product** (in Relisio, go to workspace settings, Api Keys to generate one);
+ 2. an `api-key` authorized to **Alter Storage** or **Upload Artefact** (in Relisio, go to workspace settings, Api Keys to generate one);
  3. a GitHub repository configured to run Actions;
 
 ### Before you start
 
  1. consider that Relisio is currently in Beta, and breaking changes may occur at any time,
  2. the `api-key` can be generated (and destroyed) from your workspace settings,
- 3. if you intend to update a product (instead of creating a new one), you must specify the `product-template-id` input,
- 4. optionally you may use this action together with 
+ 3. optionally you may use this action together with 
     - `Studio-41/relisio-project-action@v1`
 
 ### Available inputs
@@ -22,53 +21,32 @@ Use it to create/update products within your workspace.
 |---|---|:---:|:---:|
 |relisio-url| Relisio base url (only for self-hosted or enterprise installations)|false|https://relisio.com|
 |api-key| API key to authorize the deployment|true|
-|workspace-path| Path of the Workspace where to publish the Product|true|
-|product-template-id| ID of an existing product withing the workspace to clone as the base for this new product|false|
-|product-name| Name of the product. Required if `product-template-id` is not defined. When `product-template-id` is specified, Relisio will use the original name|conditional|
-|product-scope| Visibility of the product withing the workspace (private, internal or public)|true|internal|
+|workspace-path|The ID of an existing product/project within the workspace into which upload the artefact|true|
+|resource-id| ID of an existing product withing the workspace to clone as the base for this new product|true|
+|resource-type|The type of resource into which the artefact will upload (project, product, environment, kb)|true|
+|artefact-scope|The visibility of the artefact once created. Despite which scope has the resource containing this artefact, it can have its visibility scope (inherit, internal or public)|true|`inherit`|
+|artefact-path|The path of the file to upload|true|
 
 ### Available outputs
 
 |id|description|
 |---|:---|
-|product-id|The string representing the new product ID|
-|api-url|The URL pointing to the new product|
-|public-url|The public URL of the product (visible depending on the selected `scope`)|
+|artefact-id|ID of the uploaded artefact|
+|artefact-sha256|sha256 of the created artefact|
+|public-url|Full path from where to download the artefact|
+|sha256-url|Full path from where to download the corresponding sha256 of the artefact|
 
-## Deploy a new product
+## Ensuring Data Integrity with Hash Code
+Relisio will always create a corresponding .sha256 file for each artefact uploaded (via API, GitHub Action, or interface). Use this information to double-check the integrity of your published artefacts.
 
-The following example publishes a new product into your workspace every time a Tag (having `v` prefix) is created.<br/>
+A recommended way to ensure integrity is to generate a .sha256 prove locally before uploading the file to Relisio and then compare both values to trust the uploaded artefact.
 
- - An empty product will be created as the `product-template-id` isn't specified.
- - The product will be created inside the Workspace `workspace-path`.
- - As the `visibility` is `internal`, the product will be visible by the users at the workspace only.
+## Update a product with the last artefact
 
-```yaml
-on:
-  push:
-    tags:
-      - "v*"
+The following example uploads the file `program.exe` into **an existing product**.<br/>
 
-jobs:
-  deloy:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Deploy As Relisio Product 
-      uses: Studio-41/relisio-product-action@v1
-      with:
-        api-key: ${{ secrets.RELISIO_API_KEY }}
-        workspace-path: ${{ secrets.RELISIO_WORKSPACE }}
-        visibility: internal
-        product-name: The Name of The Product
-```
-
-## Deploy a new product (cloning a template)
-
-The following example publishes a new product, cloning an existing one, into your workspace.<br/>
-
- - A new product will be created cloning the product `product-template-id`.
- - The product will be created inside the Workspace `workspace-path`.
- - As the `visibility` is `public`, the product will be visible by the Internet (if you are running a self-hosted version of Relisio, `public` is may be limited by your networking policies).
+ - As the `resource-type` is `product` the artefact will be associated to that existing product.
+ - As the `visibility` is `inherit`, the artefact will be set to use the host product.
 
 ```yaml
 on:
@@ -80,27 +58,26 @@ jobs:
   deloy:
     runs-on: ubuntu-latest
     steps:
-    - name: Deploy As Relisio Product 
-      uses: Studio-41/relisio-product-action@v1
+    - name: Deploy As Relisio Artefact 
+      uses: Studio-41/relisio-artefact-action@v1
       with:
         api-key: ${{ secrets.RELISIO_API_KEY }}
         workspace-path: ${{ secrets.RELISIO_WORKSPACE }}
-        visibility: public
-        product-template-id: ${{ secrets.RELISIO_PRODUCT_TEMPLATE_ID }}
+        resource-id: ${{ secrets.RELISIO_PRODUCT_A }}
+        resource-type: product
+        artefact-scope: inherit
+        artefact-path: ./program.exe
 ```
-
- - As the `product-template-id` is specified, Relisio will clone the content from that product (within the workspace).
-
 <hr/>
 
-### <img src="https://user-images.githubusercontent.com/11739105/152801493-cb6ccd69-7968-45a1-a422-01e2ea9a9e48.svg" alt="Artifact" width="32"> Work with Relisio Artefacts
+### <img src="https://user-images.githubusercontent.com/11739105/152799348-e70d55f4-3914-43cd-866f-f2b979071be2.svg" alt="Product" width="32"> Work with Relisio Product
 
-You can optionally configure your GitHub Workflow to upload **any artefact** as part of the new product using `Studio-41/relisio-artefact-action@v1` ([more details](https://github.com/Studio-41/relisio-artefact-action)).
+You can optionally configure your GitHub Workflow to create **product** on the fly and then upload a new artefact into it `Studio-41/relisio-product-action@v1` ([more details](https://github.com/Studio-41/relisio-product-action)).
 
 
 ### <img src="https://user-images.githubusercontent.com/11739105/152803355-69bfce13-e6ee-4f7b-a53e-6cee391e0273.svg" alt="Project" width="32"> Work with Relisio Projects
 
-If you want to publish this product as part of a new Release for a specific Relisio Environment, you can combine this action with `Studio-41/relisio-project-action@v1` ([more details](https://github.com/Studio-41/relisio-project-action)).
+If you want to publish artefacts as part of a new Release for a specific Relisio Environment, you can combine this action with `Studio-41/relisio-project-action@v1` ([more details](https://github.com/Studio-41/relisio-project-action)).
 
 <hr/>
 

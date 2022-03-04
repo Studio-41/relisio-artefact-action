@@ -1,5 +1,5 @@
-name: 'Update Relisio Product Portfolio'
-description: 'Create/Update a Relisio product from GitHub'
+name: 'Update an artefact to Relisio'
+description: 'Update an artefact to Relisio from GitHub'
 inputs:
     relisio-url:
         description: 'Relisio base url (only for enterprise installations)'
@@ -11,26 +11,29 @@ inputs:
     workspace-path:
         description: 'Path of the Workspace where to publish the Product'
         required: true
-    product-template-id:
-        description: 'ID of an existing product withing the workspace to clone as the base for this new product'
-        required: false
-    product-id:
-        description: 'ID of an existing product (only if you want to update the existing product)'
-        required: false
-    product-name:
-        description: 'Name of the product'
+    resource-id:
+        description: 'The ID of an existing product/project within the workspace into which upload the artefact'
         required: true
-    product-scope:
-        description: 'Visibility of the product withing the workspace (private, internal or public)'
+    resource-type:
+        description: 'The type of resource into which the artefact will upload (project, product, environment, kb)'
         required: true
-        default: 'internal'
+    artefact-scope:
+        description: 'The visibility of the artefact once created. Despite which scope has the resource containing this artefact, it can have its visibility scope (inherit, internal or public)'
+        required: true
+        default: 'inherit'
+    artefact-path:
+        description: 'The path of the file to upload'
+        required: true
+
 outputs:
-    product-id:
-        description: 'ID of the Deployed Product'
+    artefact-id:
+        description: 'ID of the uploaded artefact'
+    artefact-sha256:
+        description: 'sha256 of the created artefact'
     public-url:
-        description: 'Public URL of the Deployed Product'
-    api-url:
-        description: 'API URL of the Deployed Product'
+        description: 'Full path from where to download the artefact'
+    sha256-url:
+        description: 'Full path from where to download the corresponding sha256 of the artefact'
 branding:
     icon: 'save'
     color: 'blue'
