@@ -13,6 +13,7 @@ Use it to upload artefacts within your resources (like products, projects, kb).
  1. consider that Relisio is currently in Beta, and breaking changes may occur at any time,
  2. the `api-key` can be generated (and destroyed) from your workspace settings,
  3. optionally you may use this action together with 
+    - `Studio-41/relisio-product-action@v1`
     - `Studio-41/relisio-project-action@v1`
 
 ### Available inputs
@@ -58,7 +59,7 @@ jobs:
   deloy:
     runs-on: ubuntu-latest
     steps:
-    - name: Deploy As Relisio Artefact 
+    - name: Upload artefact to Relisio
       uses: Studio-41/relisio-artefact-action@v1
       with:
         api-key: ${{ secrets.RELISIO_API_KEY }}
