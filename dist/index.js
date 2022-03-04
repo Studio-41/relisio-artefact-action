@@ -48,27 +48,42 @@ function run() {
             if (!workspacePath) {
                 throw new Error('workspace-path is required');
             }
-            const productName = core.getInput('product-name');
-            const productScope = core.getInput('product-scope');
+            const resourceId = core.getInput('resource-id');
+            if (!resourceId) {
+                throw new Error('resource-id is required');
+            }
+            const resourceType = core.getInput('resource-type');
+            if (!resourceType) {
+                throw new Error('resource-type is required');
+            }
+            const availableResourceTypes = ['project, product, environment, kb'];
+            if (!availableResourceTypes.includes(resourceType)) {
+                throw new Error(`resource-type must be one of ${availableResourceTypes.join(', ')}`);
+            }
+            const artefactScope = core.getInput('artefact-scope') || 'inherit';
+            if (!artefactScope) {
+                throw new Error('artefact-scope is required');
+            }
+            const availableArtefactScopes = ['inherit', 'internal', 'public'];
+            if (!availableArtefactScopes.includes(artefactScope)) {
+                throw new Error(`artefact-scope must be one of ${availableArtefactScopes.join(', ')}`);
+            }
+            const artefactPath = core.getInput('artefact-path');
+            if (!artefactPath) {
+                throw new Error('artefact-path is required');
+            }
             const relisoUrl = core.getInput('relisio-url');
             if (!relisoUrl) {
                 throw new Error('relisio-url is required');
             }
-            const originalId = core.getInput('product-template-id');
-            if (!originalId && !productName) {
-                throw new Error('product-template-id or product-name is required');
-            }
-            const url = `${relisoUrl}/api/v1/workspaces/${workspacePath}/products`;
-            const { _id, name = '' } = yield (0, net_1.post)(url, apiKey, JSON.stringify({
-                originalId,
-                productName,
-                productScope
-            }));
-            const apiUrl = `${relisoUrl}/workspaces/${workspacePath}/products/${name}`;
-            const publicUrl = `${relisoUrl}/${workspacePath}/${name}`;
-            core.setOutput('product-id', _id);
-            core.setOutput('api-url', apiUrl);
+            const { artefactId, sha256 } = yield (0, net_1.upload)();
+            const publicUrl = `${relisoUrl}/api/v1/artefacts/${artefactId}/download`;
+            const sha256Url = `${relisoUrl}/api/v1/artefacts/${artefactId}/sha256`;
+            // const url = `${relisoUrl}/api/v1/workspaces/${workspacePath}/${resourceType}s`
+            core.setOutput('artefact-id', artefactId);
+            core.setOutput('artefact-sha256', sha256);
             core.setOutput('public-url', publicUrl);
+            core.setOutput('sha256-url', sha256Url);
         }
         catch (error) {
             core.debug(`Deployment Failed with Error: ${error}`);
@@ -99,7 +114,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.post = void 0;
+exports.upload = exports.post = void 0;
 const http_1 = __importDefault(__nccwpck_require__(605));
 const https_1 = __importDefault(__nccwpck_require__(211));
 const post = (url, apiKey, body) => __awaiter(void 0, void 0, void 0, function* () {
@@ -140,6 +155,12 @@ const post = (url, apiKey, body) => __awaiter(void 0, void 0, void 0, function* 
     });
 });
 exports.post = post;
+const upload = () => __awaiter(void 0, void 0, void 0, function* () {
+    return new Promise((resolve, reject) => {
+        reject(new Error('Not implemented'));
+    });
+});
+exports.upload = upload;
 
 
 /***/ }),

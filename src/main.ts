@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import {post} from './net'
+import {upload} from './net'
 
 async function run(): Promise<void> {
   try {
@@ -14,39 +14,55 @@ async function run(): Promise<void> {
       throw new Error('workspace-path is required')
     }
 
-    const productName = core.getInput('product-name')
+    const resourceId = core.getInput('resource-id')
+    if (!resourceId) {
+      throw new Error('resource-id is required')
+    }
 
-    const productScope = core.getInput('product-scope')
+    const resourceType = core.getInput('resource-type')
+    if (!resourceType) {
+      throw new Error('resource-type is required')
+    }
+    const availableResourceTypes = ['project, product, environment, kb']
+    if (!availableResourceTypes.includes(resourceType)) {
+      throw new Error(
+        `resource-type must be one of ${availableResourceTypes.join(', ')}`
+      )
+    }
+
+    const artefactScope = core.getInput('artefact-scope') || 'inherit'
+    if (!artefactScope) {
+      throw new Error('artefact-scope is required')
+    }
+
+    const availableArtefactScopes = ['inherit', 'internal', 'public']
+    if (!availableArtefactScopes.includes(artefactScope)) {
+      throw new Error(
+        `artefact-scope must be one of ${availableArtefactScopes.join(', ')}`
+      )
+    }
+
+    const artefactPath = core.getInput('artefact-path')
+    if (!artefactPath) {
+      throw new Error('artefact-path is required')
+    }
 
     const relisoUrl = core.getInput('relisio-url')
     if (!relisoUrl) {
       throw new Error('relisio-url is required')
     }
 
-    const originalId = core.getInput('product-template-id')
+    const {artefactId, sha256} = await upload()
 
-    if (!originalId && !productName) {
-      throw new Error('product-template-id or product-name is required')
-    }
+    const publicUrl = `${relisoUrl}/api/v1/artefacts/${artefactId}/download`
+    const sha256Url = `${relisoUrl}/api/v1/artefacts/${artefactId}/sha256`
 
-    const url = `${relisoUrl}/api/v1/workspaces/${workspacePath}/products`
+    // const url = `${relisoUrl}/api/v1/workspaces/${workspacePath}/${resourceType}s`
 
-    const {_id, name = ''} = await post<{_id: string; name: string}>(
-      url,
-      apiKey,
-      JSON.stringify({
-        originalId,
-        productName,
-        productScope
-      })
-    )
-
-    const apiUrl = `${relisoUrl}/workspaces/${workspacePath}/products/${name}`
-    const publicUrl = `${relisoUrl}/${workspacePath}/${name}`
-
-    core.setOutput('product-id', _id)
-    core.setOutput('api-url', apiUrl)
+    core.setOutput('artefact-id', artefactId)
+    core.setOutput('artefact-sha256', sha256)
     core.setOutput('public-url', publicUrl)
+    core.setOutput('sha256-url', sha256Url)
   } catch (error) {
     core.debug(`Deployment Failed with Error: ${error}`)
     core.setFailed(`Deployment Failed with Error: ${error}`)

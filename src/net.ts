@@ -46,3 +46,8 @@ export const post = async <T>(
     req.write(body)
     req.end()
   })
+
+export const upload = async <T>(): Promise<T> =>
+  new Promise((resolve, reject) => {
+    reject(new Error('Not implemented'))
+  })
