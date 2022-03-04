@@ -1,7 +1,7 @@
 <img src="https://user-images.githubusercontent.com/11739105/156749223-0a34348c-2155-4599-8b51-778cb9c91d50.svg" alt="Relisio Artefact"  width="128" />
 
 This Github action is an official [Relisio](https://www.relisio.com/) deploy utility.<br />
-Use it to upload artefacts within your products/projects.
+Use it to upload artefacts within your resources (like products, projects, kb).
 
 ### Prerequisites
  1. an active workspace at [www.relisio.com](https://www.relisio.com) or a self-hosted copy of Relisio;

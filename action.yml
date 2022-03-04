@@ -1,4 +1,4 @@
-name: 'Update an artefact to Relisio'
+name: 'Upload an artefact to Relisio'
 description: 'Update an artefact to Relisio from GitHub'
 inputs:
     relisio-url:
@@ -35,7 +35,7 @@ outputs:
     sha256-url:
         description: 'Full path from where to download the corresponding sha256 of the artefact'
 branding:
-    icon: 'save'
+    icon: 'upload-cloud'
     color: 'blue'
 runs:
   using: 'node12'
