@@ -72,9 +72,7 @@ export const upload = async <T>(
 
     const request = urlObject.protocol === 'https:' ? https : http
 
-    const options = optionFactory(urlObject, apiKey, {
-      'Content-Type': form.getHeaders()['content-type']
-    })
+    const options = optionFactory(urlObject, apiKey, form.getHeaders())
 
     const req = request
       .request(options, res => {
@@ -96,5 +94,5 @@ export const upload = async <T>(
         reject(err)
       })
 
-    req.end()
+    form.pipe(req)
   })

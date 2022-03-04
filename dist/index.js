@@ -166,9 +166,7 @@ const upload = (url, apiKey, path) => __awaiter(void 0, void 0, void 0, function
         form.append('artefact', readStream);
         const urlObject = new URL(url);
         const request = urlObject.protocol === 'https:' ? https_1.default : http_1.default;
-        const options = (0, exports.optionFactory)(urlObject, apiKey, {
-            'Content-Type': form.getHeaders()['content-type']
-        });
+        const options = (0, exports.optionFactory)(urlObject, apiKey, form.getHeaders());
         const req = request
             .request(options, res => {
             let r = '';
@@ -187,7 +185,7 @@ const upload = (url, apiKey, path) => __awaiter(void 0, void 0, void 0, function
             .on('error', err => {
             reject(err);
         });
-        req.end();
+        form.pipe(req);
     });
 });
 exports.upload = upload;
