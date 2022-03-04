@@ -52,12 +52,14 @@ async function run(): Promise<void> {
       throw new Error('relisio-url is required')
     }
 
-    const {artefactId, sha256} = await upload()
+    const now = new Date().getTime()
 
-    const publicUrl = `${relisoUrl}/api/v1/artefacts/${artefactId}/download`
-    const sha256Url = `${relisoUrl}/api/v1/artefacts/${artefactId}/sha256`
+    const url = `${relisoUrl}/api/v1/workspaces/${workspacePath}/${resourceType}s/${resourceId}/static/${now}`
 
-    // const url = `${relisoUrl}/api/v1/workspaces/${workspacePath}/${resourceType}s`
+    const {artefactId, sha256} = await upload(url, apiKey, artefactPath)
+
+    const publicUrl = `${url}`
+    const sha256Url = `${url}?asSignature=true`
 
     core.setOutput('artefact-id', artefactId)
     core.setOutput('artefact-sha256', sha256)
