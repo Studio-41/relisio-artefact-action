@@ -56,10 +56,14 @@ async function run(): Promise<void> {
 
     const url = `${relisoUrl}/api/v1/workspaces/${workspacePath}/${resourceType}s/${resourceId}/static/${now}`
 
-    const {artefactId, sha256} = await upload(url, apiKey, artefactPath)
+    const {
+      artefactId,
+      sha256,
+      publicUrl: path // publicUrl does not include the hostname
+    } = await upload(url, apiKey, artefactPath)
 
-    const publicUrl = `${url}`
-    const sha256Url = `${url}?asSignature=true`
+    const publicUrl = `${relisoUrl}/${path}`
+    const sha256Url = `${relisoUrl}?asSha256=true`
 
     core.setOutput('artefact-id', artefactId)
     core.setOutput('artefact-sha256', sha256)

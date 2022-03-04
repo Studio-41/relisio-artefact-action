@@ -78,9 +78,10 @@ function run() {
             }
             const now = new Date().getTime();
             const url = `${relisoUrl}/api/v1/workspaces/${workspacePath}/${resourceType}s/${resourceId}/static/${now}`;
-            const { artefactId, sha256 } = yield (0, net_1.upload)(url, apiKey, artefactPath);
-            const publicUrl = `${url}`;
-            const sha256Url = `${url}?asSignature=true`;
+            const { artefactId, sha256, publicUrl: path // publicUrl does not include the hostname
+             } = yield (0, net_1.upload)(url, apiKey, artefactPath);
+            const publicUrl = `${relisoUrl}/${path}`;
+            const sha256Url = `${relisoUrl}?asSha256=true`;
             core.setOutput('artefact-id', artefactId);
             core.setOutput('artefact-sha256', sha256);
             core.setOutput('public-url', publicUrl);
@@ -178,7 +179,12 @@ const upload = (url, apiKey, path) => __awaiter(void 0, void 0, void 0, function
                     reject(new Error(`Status code: ${res.statusCode} - ${r}`));
                 }
                 else {
-                    resolve(JSON.parse(r));
+                    try {
+                        resolve(JSON.parse(r));
+                    }
+                    catch (error) {
+                        reject(error);
+                    }
                 }
             });
         })

@@ -86,7 +86,11 @@ export const upload = async <T>(
           if (res.statusCode !== 200 && res.statusCode !== 201) {
             reject(new Error(`Status code: ${res.statusCode} - ${r}`))
           } else {
-            resolve(JSON.parse(r))
+            try {
+              resolve(JSON.parse(r))
+            } catch (error) {
+              reject(error)
+            }
           }
         })
       })
