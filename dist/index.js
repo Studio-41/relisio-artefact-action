@@ -167,7 +167,6 @@ const upload = (url, apiKey, path) => __awaiter(void 0, void 0, void 0, function
         const urlObject = new URL(url);
         const request = urlObject.protocol === 'https:' ? https_1.default : http_1.default;
         const options = (0, exports.optionFactory)(urlObject, apiKey, {
-            'Content-Length': form.getLengthSync(),
             'Content-Type': form.getHeaders()['content-type']
         });
         const req = request

@@ -73,7 +73,6 @@ export const upload = async <T>(
     const request = urlObject.protocol === 'https:' ? https : http
 
     const options = optionFactory(urlObject, apiKey, {
-      'Content-Length': form.getLengthSync(),
       'Content-Type': form.getHeaders()['content-type']
     })
 
